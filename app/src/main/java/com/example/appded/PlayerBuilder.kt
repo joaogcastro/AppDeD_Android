@@ -3,8 +3,8 @@ package com.example.appded
 import races.*
 import kotlin.math.floor
 
-class PlayerBuilder(
-    private val races: Array<Race> = arrayOf(
+class PlayerBuilder (
+    private val races: Array<Race> = arrayOf (
         Dragonborn(),
         Dwarf(),
         Elf(),
@@ -15,7 +15,7 @@ class PlayerBuilder(
         Human(),
         Tiefling()
     ),
-    private val abilitiesSample: Array<String> = arrayOf(
+    val abilitiesSample: Array<String> = arrayOf(
         "Strength",
         "Dexterity",
         "Constitution",
@@ -82,5 +82,19 @@ class PlayerBuilder(
     internal fun constitutionModifier(constitution: Int): Int {
         val result = (constitution - 10).toDouble() / 2
         return floor(result).toInt()
+    }
+
+    fun assignAbilities(player: Player, abilities: Map<String, Int>) {
+        val totalPointsSpent = abilities.entries.sumOf { pointCost[it.value] ?: 0 }
+
+        if (totalPointsSpent <= pointBuyBalance) {
+            abilities.forEach { (ability, value) ->
+                player.abilities[ability] = value
+            }
+            pointBuyBalance -= totalPointsSpent // Atualiza o saldo de pontos
+        } else {
+            // Aqui você pode adicionar uma mensagem de erro se os pontos ultrapassarem o limite
+            throw IllegalArgumentException("Total points spent exceeds available points.")
+        }
     }
 }

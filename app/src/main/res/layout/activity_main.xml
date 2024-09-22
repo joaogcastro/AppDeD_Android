@@ -20,6 +20,13 @@
         android:layout_marginTop="16dp"/>
 
     <Button
+        android:id="@+id/selectAbilitiesButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Select Abilities"
+        android:layout_below="@id/selectRaceButton"/>
+
+    <Button
         android:id="@+id/createPlayerButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
