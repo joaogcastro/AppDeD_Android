@@ -8,38 +8,53 @@
         android:id="@+id/nameInput"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Enter player name"
-        android:minHeight="48dp" />
+        android:hint="Digite o nome do jogador"
+        android:minHeight="48dp"
+        android:padding="10dp"
+        android:background="@drawable/edittext_background" />
 
     <Button
         android:id="@+id/selectRaceButton"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Select Race"
+        android:text="Selecionar Raça"
         android:layout_below="@id/nameInput"
-        android:layout_marginTop="16dp"/>
+        android:layout_marginTop="80dp"
+        android:backgroundTint="@color/colorPrimary"
+        android:textColor="@android:color/white"
+        android:padding="12dp"/>
 
     <Button
         android:id="@+id/selectAbilitiesButton"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Select Abilities"
-        android:layout_below="@id/selectRaceButton"/>
+        android:text="Selecionar Habilidades"
+        android:layout_below="@id/selectRaceButton"
+        android:layout_marginTop="80dp"
+        android:backgroundTint="@color/colorAccent"
+        android:textColor="@android:color/white"
+        android:padding="12dp"/>
 
     <Button
         android:id="@+id/createPlayerButton"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Create Player"
-        android:layout_below="@id/selectRaceButton"
-        android:layout_marginTop="16dp"/>
+        android:text="Criar Jogador"
+        android:layout_below="@id/selectAbilitiesButton"
+        android:layout_marginTop="80dp"
+        android:backgroundTint="@color/colorPrimaryDark"
+        android:textColor="@android:color/white"
+        android:padding="12dp"/>
 
     <TextView
         android:id="@+id/playerStatusTextView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/createPlayerButton"
-        android:layout_marginTop="16dp"
-        android:text="Player Status Will Appear Here"
-        android:textSize="16sp"/>
+        android:layout_marginTop="30dp"
+        android:text="O status do jogador aparecerá aqui"
+        android:textSize="16sp"
+        android:textColor="@android:color/black"
+        android:padding="10dp"/>
+
 </RelativeLayout>
