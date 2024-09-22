@@ -36,14 +36,15 @@ class MainActivity : AppCompatActivity() {
             showRaceSelectionDialog()
         }
 
+        // Removido o diálogo de seleção de habilidades
         selectAbilitiesButton.setOnClickListener {
-            showAbilitySelectionDialog()
+            showAbilityValueInputDialog()
         }
 
         createPlayerButton.setOnClickListener {
             val playerName = nameInput.text.toString()
             if (playerName.isEmpty() || selectedRace == null) {
-                Toast.makeText(this, "Please enter a name and select a race.", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "Por favor, insira um nome e selecione uma raça.", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
             player.name = playerName
@@ -60,49 +61,24 @@ class MainActivity : AppCompatActivity() {
         val raceNames = races.map { it.name }.toTypedArray()
 
         AlertDialog.Builder(this)
-            .setTitle("Select a Race")
+            .setTitle("Selecione uma Raça")
             .setItems(raceNames) { _, which ->
                 selectedRace = races[which]
-                Toast.makeText(this, "Selected Race: ${selectedRace?.name}", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "Raça selecionada: ${selectedRace?.name}", Toast.LENGTH_SHORT).show()
             }
             .show()
     }
 
-    private fun showAbilitySelectionDialog() {
+    private fun showAbilityValueInputDialog() {
+        val builder = AlertDialog.Builder(this)
+        builder.setTitle("Insira os Valores das Habilidades")
+
         val abilities = playerBuilder.abilitiesSample
-        val selectedValues = IntArray(abilities.size)
-
-        val builder = AlertDialog.Builder(this)
-        builder.setTitle("Select Abilities")
-
-        builder.setMultiChoiceItems(abilities, selectedValues.map { it != 0 }.toBooleanArray()) { dialog, which, isChecked ->
-            if (isChecked) {
-                selectedValues[which] = 8 // valor padrÃ£o ao selecionar
-            } else {
-                selectedValues[which] = 0 // reiniciar valor ao desmarcar
-            }
-        }
-
-        builder.setPositiveButton("Next") { _, _ ->
-            showAbilityValueInputDialog(abilities, selectedValues)
-        }
-
-        builder.setNegativeButton("Cancel") { dialog, _ -> dialog.dismiss() }
-        builder.show()
-    }
-
-    private fun showAbilityValueInputDialog(abilities: Array<String>, selectedValues: IntArray) {
-        val builder = AlertDialog.Builder(this)
-        builder.setTitle("Enter Ability Values")
-
         val abilityInput = Array(abilities.size) { EditText(this) }
 
         abilities.forEachIndexed { index, ability ->
             abilityInput[index].hint = "$ability (8-15)"
             abilityInput[index].inputType = android.text.InputType.TYPE_CLASS_NUMBER
-            if (selectedValues[index] != 0) {
-                abilityInput[index].setText(selectedValues[index].toString())
-            }
         }
 
         builder.setView(LinearLayout(this).apply {
@@ -119,10 +95,10 @@ class MainActivity : AppCompatActivity() {
                 }
             }
             playerBuilder.assignAbilities(player, finalValues)
-            Toast.makeText(this, "Abilities set!", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, "Habilidades definidas!", Toast.LENGTH_SHORT).show()
         }
 
-        builder.setNegativeButton("Cancel") { dialog, _ -> dialog.dismiss() }
+        builder.setNegativeButton("Cancelar") { dialog, _ -> dialog.dismiss() }
         builder.show()
     }
 }
