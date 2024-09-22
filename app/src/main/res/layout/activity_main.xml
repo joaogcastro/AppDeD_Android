@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="16dp">
+
+    <EditText
+        android:id="@+id/nameInput"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Enter player name"
+        android:minHeight="48dp" />
+
+    <Button
+        android:id="@+id/selectRaceButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Select Race"
+        android:layout_below="@id/nameInput"
+        android:layout_marginTop="16dp"/>
+
+    <Button
+        android:id="@+id/createPlayerButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Create Player"
+        android:layout_below="@id/selectRaceButton"
+        android:layout_marginTop="16dp"/>
+
+    <TextView
+        android:id="@+id/playerStatusTextView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/createPlayerButton"
+        android:layout_marginTop="16dp"
+        android:text="Player Status Will Appear Here"
+        android:textSize="16sp"/>
+</RelativeLayout>
