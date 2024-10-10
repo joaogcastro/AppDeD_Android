@@ -58,7 +58,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun showRaceSelectionDialog() {
-        val races = playerBuilder.getAvailableRaces()
+        val races = playerBuilder.races
         val raceNames = races.map { it.name }.toTypedArray()
 
         AlertDialog.Builder(this)
@@ -77,25 +77,19 @@ class MainActivity : AppCompatActivity() {
         val abilities = playerBuilder.abilitiesSample
         val abilityInput = Array(abilities.size) { EditText(this) }
         val remainingPointsTextView = TextView(this)
-
-        // Inicializa os pontos restantes
         var totalPointsSpent = 0
 
         abilities.forEachIndexed { index, ability ->
             abilityInput[index].hint = "$ability (8-15)"
             abilityInput[index].inputType = android.text.InputType.TYPE_CLASS_NUMBER
-
-            // Listener para atualizar os pontos restantes
             abilityInput[index].addTextChangedListener(object : TextWatcher {
                 override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
 
                 override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                    // Recalcula os pontos gastos
                     totalPointsSpent = abilityInput.sumOf {
                         it.text.toString().toIntOrNull()?.let { value -> playerBuilder.pointCost[value] ?: 0 } ?: 0
                     }
 
-                    // Atualiza o TextView com os pontos restantes
                     val pointsRemaining = playerBuilder.pointBuyBalance - totalPointsSpent
                     remainingPointsTextView.text = "Pontos Restantes: $pointsRemaining"
                 }
@@ -107,28 +101,22 @@ class MainActivity : AppCompatActivity() {
         builder.setView(LinearLayout(this).apply {
             orientation = LinearLayout.VERTICAL
             abilityInput.forEach { addView(it) }
-            addView(remainingPointsTextView) // Adiciona o TextView de pontos restantes
+            addView(remainingPointsTextView)
         })
 
         builder.setPositiveButton("OK") { _, _ ->
             val finalValues = mutableMapOf<String, Int>()
-            var allFifteen = true
 
             for (i in abilities.indices) {
                 val abilityValue = abilityInput[i].text.toString().toIntOrNull()
-                if (abilityValue in 8..15) {
-                    finalValues[abilities[i]] = abilityValue!!
-                    if (abilityValue != 15) {
-                        allFifteen = false
-                    }
-                } else {
-                    allFifteen = false
+                if (abilityValue == null || abilityValue < 8 || abilityValue > 15) {
+                    Toast.makeText(this, "Valor para ${abilities[i]} deve ser entre 8 e 15.", Toast.LENGTH_SHORT).show()
+                    return@setPositiveButton
                 }
+                finalValues[abilities[i]] = abilityValue
             }
 
-            if (allFifteen) {
-                Toast.makeText(this, "Erro: Todos os valores não podem ser 15.", Toast.LENGTH_SHORT).show()
-            } else if (totalPointsSpent > 27) {
+            if (totalPointsSpent > 27) {
                 Toast.makeText(this, "Erro: O total de pontos não pode ultrapassar 27.", Toast.LENGTH_SHORT).show()
             } else {
                 playerBuilder.assignAbilities(player, finalValues)

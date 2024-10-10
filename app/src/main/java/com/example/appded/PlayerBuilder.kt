@@ -4,7 +4,7 @@ import races.*
 import kotlin.math.floor
 
 class PlayerBuilder(
-    private val races: Array<Race> = arrayOf(
+    val races: Array<Race> = arrayOf(
         Dragonborn(),
         Dwarf(),
         Elf(),
@@ -35,20 +35,7 @@ class PlayerBuilder(
     ),
     var pointBuyBalance: Int = 27
 ) {
-
-    fun create(playerName: String, selectedRace: Race?): Player {
-        val player = Player()
-        player.name = playerName
-        player.race = selectedRace
-
-        selectAbilities(player)
-        setRaceModifiers(player)
-        setHealthPoints(player)
-
-        return player
-    }
-
-    fun getStatus(player: Player): String {
+    internal fun getStatus(player: Player): String {
         return buildString {
             append("Name: ${player.name}\n")
             append("Race: ${player.race?.name}\n")
@@ -58,15 +45,6 @@ class PlayerBuilder(
             }
             append("HP: ${player.healthPoints}")
         }
-    }
-
-    fun getAvailableRaces(): Array<Race> {
-        return races
-    }
-
-    internal fun selectAbilities(player: Player) {
-        // Lógica para selecionar habilidades (placeholder)
-        player.abilities["Strength"] = 10 // Exemplo de atribuição
     }
 
     internal fun setRaceModifiers(player: Player) {
@@ -79,21 +57,20 @@ class PlayerBuilder(
         player.healthPoints = player.hitDie + constitutionModifier(player.abilities["Constitution"]!!)
     }
 
-    internal fun constitutionModifier(constitution: Int): Int {
+    private fun constitutionModifier(constitution: Int): Int {
         val result = (constitution - 10).toDouble() / 2
         return floor(result).toInt()
     }
 
-    fun assignAbilities(player: Player, abilities: Map<String, Int>) {
+    internal fun assignAbilities(player: Player, abilities: Map<String, Int>) {
         val totalPointsSpent = abilities.entries.sumOf { pointCost[it.value] ?: 0 }
 
         if (totalPointsSpent <= pointBuyBalance) {
             abilities.forEach { (ability, value) ->
                 player.abilities[ability] = value
             }
-            pointBuyBalance -= totalPointsSpent // Atualiza o saldo de pontos
+            pointBuyBalance -= totalPointsSpent
         } else {
-            // Aqui você pode adicionar uma mensagem de erro se os pontos ultrapassarem o limite
             throw IllegalArgumentException("Total points spent exceeds available points.")
         }
     }
