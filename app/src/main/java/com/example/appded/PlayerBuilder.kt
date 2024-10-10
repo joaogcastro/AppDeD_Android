@@ -3,8 +3,8 @@ package com.example.appded
 import races.*
 import kotlin.math.floor
 
-class PlayerBuilder (
-    private val races: Array<Race> = arrayOf (
+class PlayerBuilder(
+    private val races: Array<Race> = arrayOf(
         Dragonborn(),
         Dwarf(),
         Elf(),
@@ -23,7 +23,7 @@ class PlayerBuilder (
         "Wisdom",
         "Charisma"
     ),
-    private val pointCost: Map<Int, Int> = mapOf(
+    val pointCost: Map<Int, Int> = mapOf(
         8 to 0,
         9 to 1,
         10 to 2,
@@ -33,7 +33,7 @@ class PlayerBuilder (
         14 to 7,
         15 to 9
     ),
-    private var pointBuyBalance: Int = 27
+    var pointBuyBalance: Int = 27
 ) {
 
     fun create(playerName: String, selectedRace: Race?): Player {
