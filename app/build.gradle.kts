@@ -1,6 +1,7 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
+    kotlin("kapt") // se estiver usando Kapt
 }
 
 android {
@@ -39,8 +40,13 @@ android {
 }
 
 dependencies {
-    //implementation (androidx.appcompat:appcompat:1.6.1)
-    //implementation (androidx.constraintlayout:constraintlayout:2.1.4)
+    val roomVersion = "2.6.1"
+
+    implementation("androidx.room:room-runtime:$roomVersion")
+    kapt("androidx.room:room-compiler:$roomVersion") // se estiver usando Kotlin
+    implementation("androidx.room:room-ktx:$roomVersion")
+
+    implementation("com.google.code.gson:gson:2.10.1")
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.material)

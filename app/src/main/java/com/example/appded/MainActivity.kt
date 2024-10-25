@@ -11,6 +11,8 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.lifecycleScope
+import kotlinx.coroutines.launch
 import races.*
 
 class MainActivity : AppCompatActivity() {
@@ -24,6 +26,9 @@ class MainActivity : AppCompatActivity() {
     private val playerBuilder = PlayerBuilder()
     private val player = Player()
 
+    private lateinit var database: AppDatabase
+    private lateinit var playerDao: PlayerDAO
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -33,6 +38,9 @@ class MainActivity : AppCompatActivity() {
         selectRaceButton = findViewById(R.id.selectRaceButton)
         selectAbilitiesButton = findViewById(R.id.selectAbilitiesButton)
         playerStatusTextView = findViewById(R.id.playerStatusTextView)
+
+        database = AppDatabase.getDatabase(this)
+        playerDao = database.playerDao()
 
         selectRaceButton.setOnClickListener {
             showRaceSelectionDialog()
@@ -54,7 +62,15 @@ class MainActivity : AppCompatActivity() {
             playerBuilder.setHealthPoints(player)
             val playerStatus = playerBuilder.getStatus(player)
             playerStatusTextView.text = playerStatus
+
+            lifecycleScope.launch {
+                playerDao.insert(player)
+                Toast.makeText(this@MainActivity, "Personagem criado e salvo!", Toast.LENGTH_SHORT).show()
+                loadPlayers() // Atualiza a lista de jogadores após a inserção
+            }
         }
+
+        loadPlayers() // Carrega jogadores ao abrir a Activity
     }
 
     private fun showRaceSelectionDialog() {
@@ -126,5 +142,17 @@ class MainActivity : AppCompatActivity() {
 
         builder.setNegativeButton("Cancelar") { dialog, _ -> dialog.dismiss() }
         builder.show()
+    }
+
+    private fun loadPlayers() {
+        lifecycleScope.launch {
+            val players = playerDao.getAllPlayers() // Certifique-se de ter esse método no seu DAO
+            if (players.isNotEmpty()) {
+                val playersList = players.joinToString("\n") { it.name }
+                playerStatusTextView.text = playersList // Atualiza o TextView com a lista de jogadores
+            } else {
+                playerStatusTextView.text = "Nenhum personagem encontrado."
+            }
+        }
     }
 }
