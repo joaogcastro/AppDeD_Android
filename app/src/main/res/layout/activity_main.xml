@@ -13,7 +13,7 @@
         android:background="@drawable/edittext_background"
         android:textColor="#FFFFFF"
         android:textColorHint="#CCCCCC"
-        android:layout_marginBottom="30dp" />
+        android:layout_marginBottom="20dp" />
 
     <Button
         android:id="@+id/selectRaceButton"
@@ -41,8 +41,52 @@
         android:id="@+id/createPlayerButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Criar e Salvar Personagem"
+        android:text="Criar Personagem"
         android:layout_below="@id/selectAbilitiesButton"
+        android:layout_marginBottom="15dp"
+        android:background="@drawable/button_background"
+        android:textColor="#FFFFFF"
+        android:padding="12dp" />
+
+    <Button
+        android:id="@+id/savePlayerButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Salvar Personagem"
+        android:layout_below="@id/createPlayerButton"
+        android:layout_marginBottom="15dp"
+        android:background="@drawable/button_background"
+        android:textColor="#FFFFFF"
+        android:padding="12dp" />
+
+    <Button
+        android:id="@+id/editPlayerButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Editar Personagem"
+        android:layout_below="@id/savePlayerButton"
+        android:layout_marginBottom="15dp"
+        android:background="@drawable/button_background"
+        android:textColor="#FFFFFF"
+        android:padding="12dp" />
+
+    <Button
+        android:id="@+id/deletePlayerButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Excluir Personagem"
+        android:layout_below="@id/editPlayerButton"
+        android:layout_marginBottom="15dp"
+        android:background="@drawable/button_background"
+        android:textColor="#FFFFFF"
+        android:padding="12dp" />
+
+    <Button
+        android:id="@+id/displayPlayersButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Exibir Personagens"
+        android:layout_below="@id/deletePlayerButton"
         android:layout_marginBottom="30dp"
         android:background="@drawable/button_background"
         android:textColor="#FFFFFF"
@@ -52,16 +96,21 @@
         android:id="@+id/playerStatusTextView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_centerInParent="true"
+        android:layout_below="@id/displayPlayersButton"
+        android:layout_marginTop="20dp"
         android:text="O status do personagem aparecerá aqui"
         android:textColor="#FFFFFF"
         android:textSize="16sp"
         android:background="@drawable/edittext_background"
         android:padding="20dp" />
 
-    <ListView
-        android:id="@+id/playerListView"
-        android:layout_width="match_parent"
+
+    <TextView
+        android:id="@+id/feedbackTextView"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@id/playerStatusTextView"/>
+        android:layout_marginTop="16dp"
+        android:textColor="@android:color/holo_green_dark"
+        android:visibility="gone"/>
+
 </RelativeLayout>

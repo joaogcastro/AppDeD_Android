@@ -6,10 +6,10 @@ import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import android.content.Context
 
-@Database(entities = [Player::class], version = 1, exportSchema = false)
+@Database(entities = [PlayerEntity::class], version = 1, exportSchema = false)
 @TypeConverters(Converters::class)
 abstract class AppDatabase : RoomDatabase() {
-    abstract fun playerDao(): PlayerDAO
+    abstract fun playerDao(): PlayerDao
 
     companion object {
         @Volatile

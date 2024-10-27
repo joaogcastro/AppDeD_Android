@@ -1,3 +1,4 @@
+// MainActivity.kt
 package com.example.appded
 
 import android.app.AlertDialog
@@ -12,6 +13,8 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
+import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
 import kotlinx.coroutines.launch
 import races.*
 
@@ -21,26 +24,32 @@ class MainActivity : AppCompatActivity() {
     private lateinit var createPlayerButton: Button
     private lateinit var selectRaceButton: Button
     private lateinit var selectAbilitiesButton: Button
+    private lateinit var savePlayerButton: Button
+    private lateinit var editPlayerButton: Button
+    private lateinit var deletePlayerButton: Button
+    private lateinit var displayPlayersButton: Button
     private lateinit var playerStatusTextView: TextView
     private var selectedRace: Race? = null
     private val playerBuilder = PlayerBuilder()
     private val player = Player()
-
     private lateinit var database: AppDatabase
-    private lateinit var playerDao: PlayerDAO
+    private var currentPlayerId: Long? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+        database = AppDatabase.getDatabase(this)
+
         nameInput = findViewById(R.id.nameInput)
         createPlayerButton = findViewById(R.id.createPlayerButton)
         selectRaceButton = findViewById(R.id.selectRaceButton)
         selectAbilitiesButton = findViewById(R.id.selectAbilitiesButton)
+        savePlayerButton = findViewById(R.id.savePlayerButton)
+        editPlayerButton = findViewById(R.id.editPlayerButton)
+        deletePlayerButton = findViewById(R.id.deletePlayerButton)
+        displayPlayersButton = findViewById(R.id.displayPlayersButton)
         playerStatusTextView = findViewById(R.id.playerStatusTextView)
-
-        database = AppDatabase.getDatabase(this)
-        playerDao = database.playerDao()
 
         selectRaceButton.setOnClickListener {
             showRaceSelectionDialog()
@@ -62,15 +71,23 @@ class MainActivity : AppCompatActivity() {
             playerBuilder.setHealthPoints(player)
             val playerStatus = playerBuilder.getStatus(player)
             playerStatusTextView.text = playerStatus
-
-            lifecycleScope.launch {
-                playerDao.insert(player)
-                Toast.makeText(this@MainActivity, "Personagem criado e salvo!", Toast.LENGTH_SHORT).show()
-                loadPlayers() // Atualiza a lista de jogadores após a inserção
-            }
         }
 
-        loadPlayers() // Carrega jogadores ao abrir a Activity
+        savePlayerButton.setOnClickListener {
+            savePlayer()
+        }
+
+        editPlayerButton.setOnClickListener {
+            editPlayer()
+        }
+
+        deletePlayerButton.setOnClickListener {
+            deletePlayer()
+        }
+
+        displayPlayersButton.setOnClickListener {
+            displayPlayers()
+        }
     }
 
     private fun showRaceSelectionDialog() {
@@ -144,15 +161,95 @@ class MainActivity : AppCompatActivity() {
         builder.show()
     }
 
-    private fun loadPlayers() {
+    private fun savePlayer() {
         lifecycleScope.launch {
-            val players = playerDao.getAllPlayers() // Certifique-se de ter esse método no seu DAO
-            if (players.isNotEmpty()) {
-                val playersList = players.joinToString("\n") { it.name }
-                playerStatusTextView.text = playersList // Atualiza o TextView com a lista de jogadores
+            val playerEntity = PlayerEntity(
+                id = currentPlayerId ?: 0, // Se for um novo jogador, o ID será 0
+                name = player.name,
+                race = selectedRace?.name ?: "",
+                abilities = Gson().toJson(player.abilities),
+                healthPoints = player.healthPoints
+            )
+            if (currentPlayerId == null) {
+                database.playerDao().insert(playerEntity)
+                Toast.makeText(this@MainActivity, "Personagem salvo!", Toast.LENGTH_SHORT).show()
             } else {
-                playerStatusTextView.text = "Nenhum personagem encontrado."
+                database.playerDao().update(playerEntity)
+                Toast.makeText(this@MainActivity, "Personagem atualizado!", Toast.LENGTH_SHORT).show()
             }
+            clearInputFields()
         }
+    }
+
+    private fun editPlayer() {
+        lifecycleScope.launch {
+            val players = database.playerDao().getAllPlayers()
+            val playerNames = players.map { it.name }.toTypedArray()
+
+            AlertDialog.Builder(this@MainActivity)
+                .setTitle("Escolha um personagem para editar")
+                .setItems(playerNames) { _, which ->
+                    val selectedPlayer = players[which]
+                    currentPlayerId = selectedPlayer.id
+                    player.name = selectedPlayer.name
+                    selectedRace = playerBuilder.races.firstOrNull { it.name == selectedPlayer.race } // Corrigido
+                    player.abilities = Gson().fromJson(selectedPlayer.abilities, object : TypeToken<Map<String, Int>>() {}.type)
+                    player.healthPoints = selectedPlayer.healthPoints
+
+                    nameInput.setText(player.name)
+                    playerStatusTextView.text = playerBuilder.getStatus(player)
+                    Toast.makeText(this@MainActivity, "Personagem carregado para edição!", Toast.LENGTH_SHORT).show()
+                }
+                .show()
+        }
+    }
+
+    private fun deletePlayer() {
+        lifecycleScope.launch {
+            val players = database.playerDao().getAllPlayers()
+            val playerNames = players.map { it.name }.toTypedArray()
+
+            AlertDialog.Builder(this@MainActivity)
+                .setTitle("Escolha um personagem para excluir")
+                .setItems(playerNames) { _, which ->
+                    val selectedPlayer = players[which]
+
+                    // Confirmação antes da exclusão
+                    AlertDialog.Builder(this@MainActivity)
+                        .setTitle("Confirmação")
+                        .setMessage("Você tem certeza que deseja excluir ${selectedPlayer.name}?")
+                        .setPositiveButton("Sim") { _, _ ->
+                            lifecycleScope.launch {
+                                database.playerDao().delete(selectedPlayer)
+                                Toast.makeText(this@MainActivity, "Personagem excluído!", Toast.LENGTH_SHORT).show()
+                            }
+                        }
+                        .setNegativeButton("Não") { dialog, _ -> dialog.dismiss() }
+                        .show()
+                }
+                .show()
+        }
+    }
+
+
+    private fun displayPlayers() {
+        lifecycleScope.launch {
+            val players = database.playerDao().getAllPlayers()
+            val playerNames = players.joinToString("\n") { it.name }
+            AlertDialog.Builder(this@MainActivity)
+                .setTitle("Personagens Salvos")
+                .setMessage(playerNames.ifEmpty { "Nenhum personagem salvo." })
+                .setPositiveButton("OK") { dialog, _ -> dialog.dismiss() }
+                .show()
+        }
+    }
+
+    private fun clearInputFields() {
+        nameInput.text.clear()
+        selectedRace = null
+        player.abilities.clear()
+        player.healthPoints = 10
+        playerStatusTextView.text = "O status do personagem aparecerá aqui"
+        currentPlayerId = null
     }
 }
