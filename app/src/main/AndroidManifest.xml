@@ -8,6 +8,7 @@
         android:allowBackup="true"
         android:supportsRtl="true"
         android:theme="@style/Theme.AppCompat.DayNight.DarkActionBar">
+
         <activity
             android:name=".MainActivity"
             android:exported="true">
@@ -16,5 +17,15 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+       <!-- <service
+            android:name=".ForegroundService"
+            android:enabled="true"
+            android:exported="false" /> -->
+        <service
+            android:name=".ForegroundService"
+            android:exported="false" />
+
+
     </application>
 </manifest>

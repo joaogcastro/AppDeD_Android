@@ -33,6 +33,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var selectAbilitiesButton: Button
     private lateinit var playerStatusTextView: TextView
     private lateinit var createNotificationButton: Button // Botão para enviar notificação
+    private lateinit var startServiceButton: Button // Botão para iniciar o serviço
     private var selectedRace: Race? = null
     private val playerBuilder = PlayerBuilder()
     private val player = Player()
@@ -51,6 +52,7 @@ class MainActivity : AppCompatActivity() {
         selectAbilitiesButton = findViewById(R.id.selectAbilitiesButton)
         playerStatusTextView = findViewById(R.id.playerStatusTextView)
         createNotificationButton = findViewById(R.id.createNotificationButton)
+        startServiceButton = findViewById(R.id.startServiceButton)
 
         selectRaceButton.setOnClickListener { showRaceSelectionDialog() }
         selectAbilitiesButton.setOnClickListener { showAbilityValueInputDialog() }
@@ -69,6 +71,7 @@ class MainActivity : AppCompatActivity() {
             playerStatusTextView.text = playerStatus
         }
 
+        // Solicitação de permissão
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             if (checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
                 requestPermissions(arrayOf(Manifest.permission.POST_NOTIFICATIONS), REQUEST_CODE)
@@ -78,7 +81,11 @@ class MainActivity : AppCompatActivity() {
         createNotificationButton.setOnClickListener {
             createNotificationChannel() // Cria o canal primeiro
             sendNotification() // Envia a notificação
-            return@setOnClickListener
+        }
+
+        startServiceButton.setOnClickListener {
+            startService(Intent(this, ForegroundService::class.java))
+            Toast.makeText(this, "Serviço em primeiro plano iniciado", Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -256,6 +263,8 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    override fun onDestroy() {
+        super.onDestroy()
+        Log.d("MainActivity", "onDestroy chamada")
+    }
 }
-
-
