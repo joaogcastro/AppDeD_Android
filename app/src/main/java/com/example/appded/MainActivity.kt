@@ -1,16 +1,27 @@
 package com.example.appded
 
+import android.Manifest
 import android.app.AlertDialog
+import android.app.NotificationChannel
+import android.app.NotificationManager
+import android.app.PendingIntent
+import android.content.Context
+import android.content.Intent
+import android.content.pm.PackageManager
+import android.graphics.Color
+import android.media.RingtoneManager
+import android.os.Build
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
-import android.view.View
+import android.util.Log
 import android.widget.Button
 import android.widget.EditText
 import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.NotificationCompat
 import races.*
 
 class MainActivity : AppCompatActivity() {
@@ -20,9 +31,14 @@ class MainActivity : AppCompatActivity() {
     private lateinit var selectRaceButton: Button
     private lateinit var selectAbilitiesButton: Button
     private lateinit var playerStatusTextView: TextView
+    private lateinit var createNotificationButton: Button // Botão para enviar notificação
     private var selectedRace: Race? = null
     private val playerBuilder = PlayerBuilder()
     private val player = Player()
+
+    companion object {
+        private const val REQUEST_CODE = 100
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -33,14 +49,10 @@ class MainActivity : AppCompatActivity() {
         selectRaceButton = findViewById(R.id.selectRaceButton)
         selectAbilitiesButton = findViewById(R.id.selectAbilitiesButton)
         playerStatusTextView = findViewById(R.id.playerStatusTextView)
+        createNotificationButton = findViewById(R.id.createNotificationButton)
 
-        selectRaceButton.setOnClickListener {
-            showRaceSelectionDialog()
-        }
-
-        selectAbilitiesButton.setOnClickListener {
-            showAbilityValueInputDialog()
-        }
+        selectRaceButton.setOnClickListener { showRaceSelectionDialog() }
+        selectAbilitiesButton.setOnClickListener { showAbilityValueInputDialog() }
 
         createPlayerButton.setOnClickListener {
             val playerName = nameInput.text.toString()
@@ -54,6 +66,29 @@ class MainActivity : AppCompatActivity() {
             playerBuilder.setHealthPoints(player)
             val playerStatus = playerBuilder.getStatus(player)
             playerStatusTextView.text = playerStatus
+        }
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            if (checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
+                requestPermissions(arrayOf(Manifest.permission.POST_NOTIFICATIONS), REQUEST_CODE)
+            }
+        }
+
+        createNotificationButton.setOnClickListener {
+            createNotificationChannel() // Cria o canal primeiro
+            sendNotification() // Envia a notificação
+            return@setOnClickListener
+        }
+    }
+
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        if (requestCode == REQUEST_CODE) {
+            if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                Toast.makeText(this, "Permissão concedida", Toast.LENGTH_SHORT).show()
+            } else {
+                Toast.makeText(this, "Permissão negada", Toast.LENGTH_SHORT).show()
+            }
         }
     }
 
@@ -89,7 +124,6 @@ class MainActivity : AppCompatActivity() {
                     totalPointsSpent = abilityInput.sumOf {
                         it.text.toString().toIntOrNull()?.let { value -> playerBuilder.pointCost[value] ?: 0 } ?: 0
                     }
-
                     val pointsRemaining = playerBuilder.pointBuyBalance - totalPointsSpent
                     remainingPointsTextView.text = "Pontos Restantes: $pointsRemaining"
                 }
@@ -126,5 +160,63 @@ class MainActivity : AppCompatActivity() {
 
         builder.setNegativeButton("Cancelar") { dialog, _ -> dialog.dismiss() }
         builder.show()
+    }
+
+    private fun createNotificationChannel() {
+        val CHANNEL_ID = "default_channel"
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val name = "Default Channel"
+            val descriptionText = "This is the default notification channel"
+            val importance = NotificationManager.IMPORTANCE_HIGH
+            val channel = NotificationChannel(CHANNEL_ID, name, importance).apply {
+                description = descriptionText
+                enableLights(true)
+                lightColor = Color.BLUE
+                enableVibration(true)
+                vibrationPattern = longArrayOf(100, 200, 300, 400, 500, 400, 300, 200, 100)
+                setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION), null)
+            }
+
+            val notificationManager: NotificationManager =
+                getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+            notificationManager.createNotificationChannel(channel)
+
+            Log.d("Notification", "Canal criado: $CHANNEL_ID")
+        }
+    }
+
+    private fun sendNotification() {
+        val channelId = "default_channel"
+        val notificationId = 1
+
+        Log.d("Notification", "Enviando notificação...")
+
+        // Criação do PendingIntent
+        val intent = Intent(this, MainActivity::class.java).apply {
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+        }
+        val pendingIntent: PendingIntent = PendingIntent.getActivity(
+            this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
+
+        // Construção da notificação
+        val notificationBuilder = NotificationCompat.Builder(this, channelId)
+            .setSmallIcon(android.R.drawable.ic_dialog_info)
+            .setContentTitle("Notificação Ponto Extra")
+            .setContentText("Você recebeu uma nova notificação!")
+            .setStyle(NotificationCompat.BigTextStyle()
+                .bigText("Olá querido usuário!!" +
+                        " Se você está recebendo essa notificação, é porque sua aplicação funcionou!  Oba!! " +
+                        "Aproveite o nosso aplicativo, volte sempre."))
+            .setPriority(NotificationCompat.PRIORITY_HIGH)
+            .setContentIntent(pendingIntent)
+            .setAutoCancel(true)
+
+        // Envio da notificação
+        val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        notificationManager.notify(notificationId, notificationBuilder.build())
+
+        Log.d("Notification", "Notificação enviada.")
     }
 }

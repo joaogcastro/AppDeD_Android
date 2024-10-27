@@ -43,6 +43,17 @@
         android:layout_height="wrap_content"
         android:text="Criar Personagem"
         android:layout_below="@id/selectAbilitiesButton"
+        android:layout_marginBottom="15dp"
+        android:background="@drawable/button_background"
+        android:textColor="#FFFFFF"
+        android:padding="12dp" />
+
+    <Button
+        android:id="@+id/createNotificationButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Enviar Notificação"
+        android:layout_below="@id/createPlayerButton"
         android:layout_marginBottom="30dp"
         android:background="@drawable/button_background"
         android:textColor="#FFFFFF"
