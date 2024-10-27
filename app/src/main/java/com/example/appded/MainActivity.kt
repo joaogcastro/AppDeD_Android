@@ -83,9 +83,11 @@ class MainActivity : AppCompatActivity() {
             sendNotification() // Envia a notificação
         }
 
+
         startServiceButton.setOnClickListener {
             startService(Intent(this, ForegroundService::class.java))
-            Toast.makeText(this, "Serviço em primeiro plano iniciado", Toast.LENGTH_SHORT).show()
+            notificacaoSegundoPlano() // Chama a função para mostrar a notificação em segundo plano
+            Toast.makeText(this, "Serviço em segundo plano iniciado", Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -261,6 +263,27 @@ class MainActivity : AppCompatActivity() {
                 }
             }
         }
+    }
+
+    private fun notificacaoSegundoPlano() {
+        val channelId = "ForegroundServiceChannel"
+        val notificationManager = getSystemService(NotificationManager::class.java)
+
+        // Criação da notificação
+        val notificationIntent = Intent(this, MainActivity::class.java)
+        val pendingIntent = PendingIntent.getActivity(this, 0, notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
+
+        val notification = NotificationCompat.Builder(this, channelId)
+            .setContentTitle("D&D Service")
+            .setContentText("O aplicativo D&D Service está aberto em segundo plano")
+            .setSmallIcon(android.R.drawable.ic_dialog_info)
+            .setContentIntent(pendingIntent)
+            .setOngoing(true) // Impede que o usuário feche a notificação
+            .setPriority(NotificationCompat.PRIORITY_HIGH)
+            .build()
+
+        // Exibe a notificação
+        notificationManager.notify(1, notification)
     }
 
     override fun onDestroy() {
