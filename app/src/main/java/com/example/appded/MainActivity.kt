@@ -5,6 +5,7 @@ import android.app.AlertDialog
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
+import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -192,12 +193,28 @@ class MainActivity : AppCompatActivity() {
 
         Log.d("Notification", "Enviando notificação...")
 
-        // Criação do PendingIntent
-        val intent = Intent(this, MainActivity::class.java).apply {
-            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+        // Intent para a ação de resposta
+        val replyIntent = Intent(this, NotificationActionReceiver::class.java).apply {
+            action = "ACTION_REPLY"
         }
-        val pendingIntent: PendingIntent = PendingIntent.getActivity(
-            this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        val replyPendingIntent: PendingIntent = PendingIntent.getBroadcast(
+            this, 0, replyIntent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
+
+        // Intent para a ação de arquivar
+        val archiveIntent = Intent(this, NotificationActionReceiver::class.java).apply {
+            action = "ACTION_ARCHIVE"
+        }
+        val archivePendingIntent: PendingIntent = PendingIntent.getBroadcast(
+            this, 1, archiveIntent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
+
+        // Intent para a ação de marcar como lida
+        val markAsReadIntent = Intent(this, NotificationActionReceiver::class.java).apply {
+            action = "ACTION_MARK_AS_READ"
+        }
+        val markAsReadPendingIntent: PendingIntent = PendingIntent.getBroadcast(
+            this, 2, markAsReadIntent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
 
         // Construção da notificação
@@ -206,12 +223,14 @@ class MainActivity : AppCompatActivity() {
             .setContentTitle("Notificação Ponto Extra")
             .setContentText("Você recebeu uma nova notificação!")
             .setStyle(NotificationCompat.BigTextStyle()
-                .bigText("Olá querido usuário!!" +
-                        " Se você está recebendo essa notificação, é porque sua aplicação funcionou!  Oba!! " +
+                .bigText("Olá mundo!!" +
+                        " Se você está recebendo essa notificação, é porque sua aplicação funcionou! Oba!! " +
                         "Aproveite o nosso aplicativo, volte sempre."))
             .setPriority(NotificationCompat.PRIORITY_HIGH)
-            .setContentIntent(pendingIntent)
             .setAutoCancel(true)
+            .addAction(0, "Responder", replyPendingIntent) // Botão "Responder"
+            .addAction(0, "Arquivar", archivePendingIntent)  // Botão "Arquivar"
+            .addAction(0, "Marcar como Lida", markAsReadPendingIntent) // Botão "Marcar como Lida"
 
         // Envio da notificação
         val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
@@ -219,4 +238,24 @@ class MainActivity : AppCompatActivity() {
 
         Log.d("Notification", "Notificação enviada.")
     }
+
+    private inner class NotificationActionReceiver : BroadcastReceiver() {
+        override fun onReceive(context: Context?, intent: Intent?) {
+            val appContext = context?.applicationContext
+            when (intent?.action) {
+                "ACTION_REPLY" -> {
+                    Toast.makeText(appContext, "Resposta clicada!", Toast.LENGTH_SHORT).show()
+                }
+                "ACTION_ARCHIVE" -> {
+                    Toast.makeText(appContext, "Arquivar clicado!", Toast.LENGTH_SHORT).show()
+                }
+                "ACTION_MARK_AS_READ" -> {
+                    Toast.makeText(appContext, "Marcar como lida clicado!", Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
+    }
+
 }
+
+
