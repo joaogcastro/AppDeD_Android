@@ -32,8 +32,8 @@ class MainActivity : AppCompatActivity() {
     private lateinit var selectRaceButton: Button
     private lateinit var selectAbilitiesButton: Button
     private lateinit var playerStatusTextView: TextView
-    private lateinit var createNotificationButton: Button // Botão para enviar notificação
-    private lateinit var startServiceButton: Button // Botão para iniciar o serviço
+    private lateinit var createNotificationButton: Button
+    private lateinit var startServiceButton: Button
     private var selectedRace: Race? = null
     private val playerBuilder = PlayerBuilder()
     private val player = Player()
@@ -79,14 +79,14 @@ class MainActivity : AppCompatActivity() {
         }
 
         createNotificationButton.setOnClickListener {
-            createNotificationChannel() // Cria o canal primeiro
-            sendNotification() // Envia a notificação
+            createNotificationChannel()
+            sendNotification()
         }
 
 
         startServiceButton.setOnClickListener {
             startService(Intent(this, ForegroundService::class.java))
-            notificacaoSegundoPlano() // Chama a função para mostrar a notificação em segundo plano
+            notificacaoSegundoPlano()
             Toast.makeText(this, "Serviço em segundo plano iniciado", Toast.LENGTH_SHORT).show()
         }
     }
@@ -178,7 +178,7 @@ class MainActivity : AppCompatActivity() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val name = "Default Channel"
             val descriptionText = "This is the default notification channel"
-            val importance = NotificationManager.IMPORTANCE_HIGH
+            val importance = NotificationManager.IMPORTANCE_LOW // Ou IMPORTANCE_MIN para menos interação
             val channel = NotificationChannel(CHANNEL_ID, name, importance).apply {
                 description = descriptionText
                 enableLights(true)
@@ -196,13 +196,14 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+
     private fun sendNotification() {
         val channelId = "default_channel"
         val notificationId = 1
 
         Log.d("Notification", "Enviando notificação...")
 
-        // Intent para a ação de resposta
+
         val replyIntent = Intent(this, NotificationActionReceiver::class.java).apply {
             action = "ACTION_REPLY"
         }
@@ -210,7 +211,7 @@ class MainActivity : AppCompatActivity() {
             this, 0, replyIntent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
 
-        // Intent para a ação de arquivar
+
         val archiveIntent = Intent(this, NotificationActionReceiver::class.java).apply {
             action = "ACTION_ARCHIVE"
         }
@@ -218,7 +219,7 @@ class MainActivity : AppCompatActivity() {
             this, 1, archiveIntent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
 
-        // Intent para a ação de marcar como lida
+
         val markAsReadIntent = Intent(this, NotificationActionReceiver::class.java).apply {
             action = "ACTION_MARK_AS_READ"
         }
@@ -226,7 +227,7 @@ class MainActivity : AppCompatActivity() {
             this, 2, markAsReadIntent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
 
-        // Construção da notificação
+
         val notificationBuilder = NotificationCompat.Builder(this, channelId)
             .setSmallIcon(android.R.drawable.ic_dialog_info)
             .setContentTitle("Notificação Ponto Extra")
@@ -237,11 +238,11 @@ class MainActivity : AppCompatActivity() {
                         "Aproveite o nosso aplicativo, volte sempre."))
             .setPriority(NotificationCompat.PRIORITY_HIGH)
             .setAutoCancel(true)
-            .addAction(0, "Responder", replyPendingIntent) // Botão "Responder"
-            .addAction(0, "Arquivar", archivePendingIntent)  // Botão "Arquivar"
-            .addAction(0, "Marcar como Lida", markAsReadPendingIntent) // Botão "Marcar como Lida"
+            .addAction(0, "Responder", replyPendingIntent)
+            .addAction(0, "Arquivar", archivePendingIntent)
+            .addAction(0, "Marcar como Lida", markAsReadPendingIntent)
 
-        // Envio da notificação
+
         val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         notificationManager.notify(notificationId, notificationBuilder.build())
 
@@ -266,10 +267,9 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun notificacaoSegundoPlano() {
-        val channelId = "ForegroundServiceChannel"
+        val channelId = "default_channel"
         val notificationManager = getSystemService(NotificationManager::class.java)
 
-        // Criação da notificação
         val notificationIntent = Intent(this, MainActivity::class.java)
         val pendingIntent = PendingIntent.getActivity(this, 0, notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
 
@@ -278,13 +278,15 @@ class MainActivity : AppCompatActivity() {
             .setContentText("O aplicativo D&D Service está aberto em segundo plano")
             .setSmallIcon(android.R.drawable.ic_dialog_info)
             .setContentIntent(pendingIntent)
-            .setOngoing(true) // Impede que o usuário feche a notificação
-            .setPriority(NotificationCompat.PRIORITY_HIGH)
+            .setOngoing(true) // Impede que o usuário limpe a notificação Clear All
+            .setPriority(NotificationCompat.PRIORITY_MAX)
+            .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
             .build()
 
-        // Exibe a notificação
         notificationManager.notify(1, notification)
     }
+
+
 
     override fun onDestroy() {
         super.onDestroy()

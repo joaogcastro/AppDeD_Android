@@ -35,10 +35,10 @@ class ForegroundService : Service() {
             startForeground(1, notification)
             Log.d("ForegroundService", "Notificação criada e serviço iniciado")
 
-            // Iniciar uma nova coroutine para manter a notificação do serviço
+
             serviceJob = CoroutineScope(Dispatchers.Default).launch {
                 while (isActive) {
-                    updateServiceNotification() // Atualiza a notificação a cada 5 segundos
+                    updateServiceNotification()
                     delay(5000)
                 }
             }
@@ -72,11 +72,11 @@ class ForegroundService : Service() {
             .setContentText("O aplicativo D&D Service está aberto em segundo plano")
             .setSmallIcon(android.R.drawable.ic_dialog_info)
             .setContentIntent(pendingIntent)
-            .setOngoing(true) // A notificação é "em andamento"
+            .setOngoing(true)
             .setPriority(NotificationCompat.PRIORITY_HIGH)
             .build()
 
-        // Atualiza a notificação
+
         val notificationManager = getSystemService(NotificationManager::class.java)
         notificationManager.notify(1, notification)
     }
@@ -95,7 +95,7 @@ class ForegroundService : Service() {
 
     override fun onDestroy() {
         super.onDestroy()
-        serviceJob.cancel() // Cancela a coroutine ao destruir o serviço
+        serviceJob.cancel()
         Log.d("ForegroundService", "Serviço destruído")
     }
 
