@@ -49,4 +49,18 @@ class Converters {
             gson.fromJson(data, type)
         }
     }
+
+    class Converters {
+        @TypeConverter
+        fun fromAbilitiesMap(value: Map<String, Int>?): String? {
+            return Gson().toJson(value)
+        }
+
+        @TypeConverter
+        fun toAbilitiesMap(value: String?): Map<String, Int>? {
+            val type = object : TypeToken<Map<String, Int>>() {}.type
+            return Gson().fromJson(value, type)
+        }
+    }
+
 }

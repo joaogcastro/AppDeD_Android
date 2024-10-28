@@ -1,13 +1,10 @@
-package com.example.appded
-
+import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
-import androidx.room.TypeConverters
-import android.content.Context
+import com.example.appded.Player
 
-@Database(entities = [PlayerEntity::class], version = 1, exportSchema = false)
-@TypeConverters(Converters::class)
+@Database(entities = [Player::class], version = 1)
 abstract class AppDatabase : RoomDatabase() {
     abstract fun playerDao(): PlayerDao
 

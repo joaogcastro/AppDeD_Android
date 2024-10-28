@@ -1,23 +1,21 @@
-// PlayerDao.kt
-package com.example.appded
-
 import androidx.room.Dao
 import androidx.room.Insert
-import androidx.room.Query
 import androidx.room.Update
 import androidx.room.Delete
+import androidx.room.Query
+import com.example.appded.Player
 
 @Dao
 interface PlayerDao {
     @Insert
-    suspend fun insert(player: PlayerEntity)
+    suspend fun insert(player: Player)
 
     @Update
-    suspend fun update(player: PlayerEntity)
+    suspend fun update(player: Player)
 
     @Delete
-    suspend fun delete(player: PlayerEntity)
+    suspend fun delete(player: Player)
 
     @Query("SELECT * FROM players")
-    suspend fun getAllPlayers(): List<PlayerEntity>
+    suspend fun getAllPlayers(): List<Player>
 }
