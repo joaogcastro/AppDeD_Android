@@ -1,10 +1,12 @@
+package com.example.appded.database
+
 import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
-import com.example.appded.Player
+import com.example.appded.player.PlayerEntity
 
-@Database(entities = [Player::class], version = 1)
+@Database(entities = [PlayerEntity::class], version = 1)
 abstract class AppDatabase : RoomDatabase() {
     abstract fun playerDao(): PlayerDao
 
@@ -17,7 +19,7 @@ abstract class AppDatabase : RoomDatabase() {
                 val instance = Room.databaseBuilder(
                     context.applicationContext,
                     AppDatabase::class.java,
-                    "app_database"
+                    "app-database"
                 ).build()
                 INSTANCE = instance
                 instance

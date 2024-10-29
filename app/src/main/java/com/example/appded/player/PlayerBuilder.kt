@@ -1,4 +1,4 @@
-package com.example.appded
+package com.example.appded.player
 
 import races.*
 import kotlin.math.floor
@@ -40,7 +40,7 @@ class PlayerBuilder(
             append("Name: ${player.name}\n")
             append("Race: ${player.race?.name}\n")
             append("Abilities:\n")
-            player.abilities.forEach { (ability, value) ->
+            player.abilities?.forEach { (ability, value) ->
                 append("$ability: $value\n")
             }
             append("HP: ${player.healthPoints}")
@@ -49,12 +49,12 @@ class PlayerBuilder(
 
     internal fun setRaceModifiers(player: Player) {
         player.race?.modifiers?.forEach { (ability, modifier) ->
-            player.abilities[ability] = (player.abilities[ability] ?: 0) + modifier
+            player.abilities?.set(ability, (player.abilities?.get(ability) ?: 0) + modifier)
         }
     }
 
     internal fun setHealthPoints(player: Player) {
-        player.healthPoints = player.hitDie + constitutionModifier(player.abilities["Constitution"]!!)
+        player.healthPoints = player.hitDie + constitutionModifier(player.abilities?.get("Constitution")!!)
     }
 
     private fun constitutionModifier(constitution: Int): Int {
@@ -67,7 +67,7 @@ class PlayerBuilder(
 
         if (totalPointsSpent <= pointBuyBalance) {
             abilities.forEach { (ability, value) ->
-                player.abilities[ability] = value
+                player.abilities?.set(ability, value)
             }
             pointBuyBalance -= totalPointsSpent
         } else {
