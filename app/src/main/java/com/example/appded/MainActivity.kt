@@ -50,9 +50,18 @@ class MainActivity : AppCompatActivity() {
         deletePlayerButton = findViewById(R.id.deletePlayerButton)
         deletePlayerButton.visibility = View.GONE
         deletePlayerButton.setOnClickListener {
-            Toast.makeText(this, "Deletar player.", Toast.LENGTH_SHORT).show()
+            lifecycleScope.launch {
+				try {
+					playerController.delete(selectedPlayer)
+					Toast.makeText(this, "Jogador ${selectedPlayer.name}deletado com sucesso", Toast.LENGTH_SHORT).show()
+					loadPlayers()
+				} catch (e) {
+					Toast.makeText(this, "Erro ao deletar jogador ${e}", Toast.LENGTH_SHORT).show()
+				}
+			}
         }
-
+		
+		// List dinamica que mostra os players na tela
         playersListView = findViewById(R.id.playersListView)
         loadPlayers()
     }
@@ -81,6 +90,7 @@ class MainActivity : AppCompatActivity() {
                 return textView
             }
         }
+		
         playersListView.adapter = adapter
 
         playersListView.setOnItemClickListener { _, _, position, _ ->

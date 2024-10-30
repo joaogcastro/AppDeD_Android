@@ -34,13 +34,13 @@ class CreatePlayerActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_create_player) // Use o layout correto
+        setContentView(R.layout.activity_create_player)
 
         // Inicializa o banco de dados
         database = AppDatabase.getDatabase(applicationContext)
         playerController = PlayerController(database.playerDao())
 
-        // Referências às views
+        // Referencias as views
         nameInput = findViewById(R.id.nameInput)
         selectRaceButton = findViewById(R.id.selectRaceButton)
         selectAbilitiesButton = findViewById(R.id.selectAbilitiesButton)
@@ -52,9 +52,7 @@ class CreatePlayerActivity : AppCompatActivity() {
         selectAbilitiesButton.setOnClickListener { showAbilityValueInputDialog() }
         createPlayerButton = findViewById(R.id.createPlayerButton)
         createPlayerButton.setOnClickListener { createPlayer() }
-        backButton.setOnClickListener {
-            finish()
-        }
+        backButton.setOnClickListener { finish() }
     }
 
     private fun createPlayer() {
@@ -139,7 +137,7 @@ class CreatePlayerActivity : AppCompatActivity() {
             }
 
             if (totalPointsSpent > 27) {
-                Toast.makeText(this, "Erro: O total de pontos não pode ultrapassar 27.", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "Erro: O total de pontos nao pode ultrapassar 27.", Toast.LENGTH_SHORT).show()
             } else {
                 playerBuilder.assignAbilities(player, finalValues)
                 Toast.makeText(this, "Habilidades definidas!", Toast.LENGTH_SHORT).show()

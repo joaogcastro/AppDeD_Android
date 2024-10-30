@@ -35,11 +35,10 @@ class EditPlayerActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_edit_player)
 
-        // Inicializa o banco de dados e o controlador
         database = AppDatabase.getDatabase(applicationContext)
         playerController = PlayerController(database.playerDao())
 
-        // Referências às views
+        // Referencias as views
         nameInput = findViewById(R.id.nameInput)
         selectRaceButton = findViewById(R.id.selectRaceButton)
         selectAbilitiesButton = findViewById(R.id.selectAbilitiesButton)
@@ -50,7 +49,7 @@ class EditPlayerActivity : AppCompatActivity() {
         // Carregar o jogador atual a partir do Intent
         val playerId = intent.getLongExtra("PLAYER_ID", -1).toInt()
         if (playerId == -1) {
-            Toast.makeText(this, "ID de jogador inválido", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, "ID de jogador invalido", Toast.LENGTH_SHORT).show()
             finish()
             return
         }
@@ -68,11 +67,16 @@ class EditPlayerActivity : AppCompatActivity() {
         lifecycleScope.launch {
             currentPlayer = playerController.getPlayerById(playerId)!!
             if (currentPlayer != null) {
-                nameInput.setText(currentPlayer.name)
-                selectedRace = currentPlayer.race
-                playerStatusTextView.text = playerBuilder.getStatus(currentPlayer)
+                try {
+                    nameInput.setText(currentPlayer.name)
+                    playerBuild.unSetRaceModifiers(currentPlayer)
+                    selectedRace = currentPlayer.race
+                    playerStatusTextView.text = playerBuilder.getStatus(currentPlayer)
+                } catch(e) {
+                    Toast.makeText(this@EditPlayerActivity, "Erro ao carregar dados do player na activity", Toast.LENGTH_SHORT).show()    
+                }
             } else {
-                Toast.makeText(this@EditPlayerActivity, "Jogador não encontrado", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this@EditPlayerActivity, "Jogador nao encontrado", Toast.LENGTH_SHORT).show()
                 finish()
             }
         }
@@ -157,7 +161,7 @@ class EditPlayerActivity : AppCompatActivity() {
             }
 
             if (totalPointsSpent > 27) {
-                Toast.makeText(this, "Erro: O total de pontos não pode ultrapassar 27.", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "Erro: O total de pontos nao pode ultrapassar 27.", Toast.LENGTH_SHORT).show()
             } else {
                 playerBuilder.assignAbilities(currentPlayer, finalValues)
                 Toast.makeText(this, "Habilidades definidas!", Toast.LENGTH_SHORT).show()

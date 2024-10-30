@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <shape xmlns:android="http://schemas.android.com/apk/res/android"
     android:shape="rectangle">
-    <solid android:color="#333333"/> <!-- Cor de fundo escura -->
-    <corners android:radius="25dp"/> <!-- Bordas arredondadas -->
-    <padding android:left="10dp" android:right="10dp" android:top="10dp" android:bottom="10dp"/> <!-- Padding interno -->
-    <stroke android:width="2dp" android:color="#BDBDBD"/> <!-- Borda cinza -->
+    <solid android:color="#333333"/>
+    <corners android:radius="25dp"/>
+    <padding android:left="10dp" android:right="10dp" android:top="10dp" android:bottom="10dp"/>
+    <stroke android:width="2dp" android:color="#BDBDBD"/>
 </shape>

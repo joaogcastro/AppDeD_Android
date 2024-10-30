@@ -64,7 +64,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/backButton"
-        android:text="O status do personagem aparecerá aqui"
+        android:text="O status do personagem aparecera aqui"
         android:textColor="#FFFFFF"
         android:textSize="16sp"
         android:background="@drawable/edittext_background"

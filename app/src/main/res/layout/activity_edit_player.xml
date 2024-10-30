@@ -34,7 +34,7 @@
         android:id="@+id/saveChangesButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Salvar Alterações" />
+        android:text="Salvar Alteracoes" />
 
     <Button
         android:id="@+id/backButton"

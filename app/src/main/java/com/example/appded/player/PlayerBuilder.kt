@@ -4,7 +4,7 @@ import races.*
 import kotlin.math.floor
 
 class PlayerBuilder(
-    val races: Array<Race> = arrayOf(
+    private val races: Array<Race> = arrayOf(
         Dragonborn(),
         Dwarf(),
         Elf(),
@@ -15,7 +15,7 @@ class PlayerBuilder(
         Human(),
         Tiefling()
     ),
-    val abilitiesSample: Array<String> = arrayOf(
+    private val abilitiesSample: Array<String> = arrayOf(
         "Strength",
         "Dexterity",
         "Constitution",
@@ -23,7 +23,7 @@ class PlayerBuilder(
         "Wisdom",
         "Charisma"
     ),
-    val pointCost: Map<Int, Int> = mapOf(
+    private val pointCost: Map<Int, Int> = mapOf(
         8 to 0,
         9 to 1,
         10 to 2,
@@ -33,9 +33,17 @@ class PlayerBuilder(
         14 to 7,
         15 to 9
     ),
-    var pointBuyBalance: Int = 27
+    private var pointBuyBalance: Int = 27
 ) {
-    internal fun getStatus(player: Player): String {
+
+    ////////////////////////////////////////////////////////////////////////////////////////////
+    // Public functions
+    ////////////////////////////////////////////////////////////////////////////////////////////
+
+    /**
+    * Print player status
+    */
+    fun getStatus(player: Player): String {
         return buildString {
             append("Name: ${player.name}\n")
             append("Race: ${player.race?.name}\n")
@@ -47,22 +55,35 @@ class PlayerBuilder(
         }
     }
 
-    internal fun setRaceModifiers(player: Player) {
+    /**
+    * Apply the race abilities modifiers to the player
+    */
+    fun setRaceModifiers(player: Player) {
         player.race?.modifiers?.forEach { (ability, modifier) ->
             player.abilities?.set(ability, (player.abilities?.get(ability) ?: 0) + modifier)
         }
     }
 
-    internal fun setHealthPoints(player: Player) {
+    /**
+    * Remove race abilities modifiers, to prevent inconsistency while editing the player
+    */
+    fun unSetRaceModifiers(player: Player) {
+        player.race?.modifiers?.forEach { (ability, modifier) ->
+            player.abilities?.set(ability, (player.abilities?.get(ability)) - modifier)
+        }
+    }
+
+    /**
+    * Calculate and apply the player health points
+    */
+    fun setHealthPoints(player: Player) {
         player.healthPoints = player.hitDie + constitutionModifier(player.abilities?.get("Constitution")!!)
     }
 
-    private fun constitutionModifier(constitution: Int): Int {
-        val result = (constitution - 10).toDouble() / 2
-        return floor(result).toInt()
-    }
-
-    internal fun assignAbilities(player: Player, abilities: Map<String, Int>) {
+    /**
+    * Set the selectec abilities into the player
+    */
+    fun assignAbilities(player: Player, abilities: Map<String, Int>) {
         val totalPointsSpent = abilities.entries.sumOf { pointCost[it.value] ?: 0 }
 
         if (totalPointsSpent <= pointBuyBalance) {
@@ -73,5 +94,18 @@ class PlayerBuilder(
         } else {
             throw IllegalArgumentException("Total points spent exceeds available points.")
         }
+    }
+
+
+    ////////////////////////////////////////////////////////////////////////////////////////////
+    // Private functions
+    ////////////////////////////////////////////////////////////////////////////////////////////
+
+    /**
+    * Calculate the constitution to be used in HP calcule
+    */
+    private fun constitutionModifier(constitution: Int): Int {
+        val result = (constitution - 10).toDouble() / 2
+        return floor(result).toInt()
     }
 }
