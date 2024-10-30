@@ -14,28 +14,23 @@ class PlayerController (private val playerDao: PlayerDao){
     ////////////////////////////////////////////////////////////////////////////////////////////
 
      suspend fun save(player: Player) {
-         val playerEntity = PlayerEntity(
-             name = player.name,
-             race = convertRace(player.race),
-             abilities = convertAbilities(player.abilities),
-             healthPoints = player.healthPoints,
-             hitDie = player.hitDie
-         )
-        playerDao.insert(playerEntity)
+        playerDao.insert(convertToEntity(player))
      }
+
+    suspend fun update(player: Player) {
+        playerDao.update(convertToEntity(player))
+    }
+
+    suspend fun delete(player: Player) {
+        playerDao.delete(convertToEntity(player))
+    }
 
     suspend fun listAll(): List<Player> {
         val playersEntity: List<PlayerEntity> = playerDao.getAllPlayers()
         val players: MutableList<Player> = mutableListOf()
 
         for (playerE in playersEntity) {
-            players.add(Player(
-                name = playerE.name,
-                race = convertRace(playerE.race),
-                abilities = convertAbilities(playerE.abilities),
-                healthPoints = playerE.healthPoints,
-                hitDie = playerE.hitDie
-            ))
+            players.add(convertToClass(playerE))
         }
 
         return players
@@ -45,10 +40,42 @@ class PlayerController (private val playerDao: PlayerDao){
     // Private functions
     ////////////////////////////////////////////////////////////////////////////////////////////
 
+    /**
+     * Convert Player object to PlayerEntity object
+     */
+    private fun convertToEntity(player: Player): PlayerEntity {
+        return PlayerEntity(
+            name = player.name,
+            race = convertRace(player.race),
+            abilities = convertAbilities(player.abilities),
+            healthPoints = player.healthPoints,
+            hitDie = player.hitDie
+        )
+    }
+
+    /**
+     * Convert PlayerEntity object to Player object
+     */
+    private fun convertToClass(playerEntity: PlayerEntity): Player {
+        return Player(
+            name = playerEntity.name,
+            race = convertRace(playerEntity.race),
+            abilities = convertAbilities(playerEntity.abilities),
+            healthPoints = playerEntity.healthPoints,
+            hitDie = playerEntity.hitDie
+        )
+    }
+
+    /**
+     * Convert Race object to Json String
+     */
     private fun convertRace(race: Race?): String {
         return gson.toJson(race)
     }
 
+    /**
+     * Convert Json String to Race object
+     */
     private fun convertRace(race: String): Race? {
         val raceType = getRaceName(race)
 
@@ -71,10 +98,16 @@ class PlayerController (private val playerDao: PlayerDao){
         return regex.find(json)?.groups?.get(1)?.value
     }
 
+    /**
+     * Convert Abilities Map to Json String
+     */
     private fun convertAbilities(abilities: MutableMap<String, Int>?): String {
         return gson.toJson(abilities)
     }
 
+    /**
+     * Convert Json String to Abilities Map
+     */
     private fun convertAbilities(json: String): MutableMap<String, Int>? {
         return try {
             gson.fromJson(json, object : TypeToken<MutableMap<String, Int>>() {}.type)
