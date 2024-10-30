@@ -1,64 +1,41 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:padding="16dp"
     android:background="#000000">
 
-    <EditText
-        android:id="@+id/nameInput"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="Digite o nome do jogador"
-        android:minHeight="48dp"
-        android:background="@drawable/edittext_background"
-        android:textColor="#FFFFFF"
-        android:textColorHint="#CCCCCC"
-        android:layout_marginBottom="30dp" />
-
-    <Button
-        android:id="@+id/selectRaceButton"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Selecionar Raça"
-        android:layout_below="@id/nameInput"
-        android:layout_marginBottom="15dp"
-        android:background="@drawable/button_background"
-        android:textColor="#FFFFFF"
-        android:padding="12dp" />
-
-    <Button
-        android:id="@+id/selectAbilitiesButton"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Selecionar Habilidades"
-        android:layout_below="@id/selectRaceButton"
-        android:layout_marginBottom="15dp"
-        android:background="@drawable/button_background"
-        android:textColor="#FFFFFF"
-        android:padding="12dp" />
-
     <Button
         android:id="@+id/createPlayerButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Criar Personagem"
-        android:layout_below="@id/selectAbilitiesButton"
-        android:layout_marginBottom="30dp"
+        android:text="Criar Jogador"
+        android:layout_marginBottom="16dp"
         android:background="@drawable/button_background"
         android:textColor="#FFFFFF"
         android:padding="12dp" />
 
-    <TextView
-        android:id="@+id/playerStatusTextView"
+    <Button
+        android:id="@+id/editPlayerButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:text="Editar Jogador"
         android:layout_below="@id/createPlayerButton"
-        android:text="O status do personagem aparecerá aqui"
+        android:layout_marginBottom="16dp"
+        android:background="@drawable/button_background"
         android:textColor="#FFFFFF"
-        android:textSize="16sp"
-        android:background="@drawable/edittext_background"
-        android:padding="20dp"
-        android:layout_marginBottom="16dp" />
+        android:padding="12dp" />
+
+    <Button
+        android:id="@+id/deletePlayerButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Deletar Jogador"
+        android:layout_below="@+id/editPlayerButton"
+        android:layout_marginBottom="16dp"
+        android:background="@drawable/button_background"
+        android:textColor="#FFFFFF"
+        android:padding="12dp" />
 
     <TextView
         android:id="@+id/playersTitleTextView"
@@ -67,20 +44,14 @@
         android:text="Jogadores no Banco de Dados"
         android:textColor="#FFFFFF"
         android:textSize="18sp"
-        android:layout_below="@id/playerStatusTextView"
+        android:layout_below="@+id/deletePlayerButton"
         android:layout_marginBottom="8dp" />
 
-    <ScrollView
+    <ListView
+        android:id="@+id/playersListView"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/playersTitleTextView">
+        android:layout_height="match_parent"
+        android:layout_below="@+id/playersTitleTextView"
+        android:layout_marginTop="16dp" />
 
-        <TextView
-            android:id="@+id/playersTextView"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:padding="16dp"
-            android:textSize="16sp"
-            android:textColor="#FFFFFF" />
-    </ScrollView>
 </RelativeLayout>

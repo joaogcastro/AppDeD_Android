@@ -25,6 +25,14 @@ class PlayerController (private val playerDao: PlayerDao){
         playerDao.delete(convertToEntity(player))
     }
 
+    suspend fun getPlayerById(id: Int): Player? {
+        val playerEntity = playerDao.getPlayerById(id)
+        if (playerEntity != null) {
+            return convertToClass(playerEntity)
+        }
+        return null
+    }
+
     suspend fun listAll(): List<Player> {
         val playersEntity: List<PlayerEntity> = playerDao.getAllPlayers()
         val players: MutableList<Player> = mutableListOf()
@@ -45,6 +53,7 @@ class PlayerController (private val playerDao: PlayerDao){
      */
     private fun convertToEntity(player: Player): PlayerEntity {
         return PlayerEntity(
+            id = player.id,
             name = player.name,
             race = convertRace(player.race),
             abilities = convertAbilities(player.abilities),
@@ -58,6 +67,7 @@ class PlayerController (private val playerDao: PlayerDao){
      */
     private fun convertToClass(playerEntity: PlayerEntity): Player {
         return Player(
+            id = playerEntity.id,
             name = playerEntity.name,
             race = convertRace(playerEntity.race),
             abilities = convertAbilities(playerEntity.abilities),

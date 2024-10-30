@@ -6,6 +6,7 @@ import androidx.room.PrimaryKey
 import races.Race
 
 class Player (
+    var id: Int = 0,
     var name: String = "",
     var race: Race? = null,
     var abilities: MutableMap<String, Int>? = mutableMapOf(
@@ -22,7 +23,7 @@ class Player (
 
 @Entity(tableName = "players")
 data class PlayerEntity(
-    @PrimaryKey(autoGenerate = true) val id: Int = 0,
+    @PrimaryKey(autoGenerate = true) val id: Int,
     @ColumnInfo(name = "name") val name: String,
     @ColumnInfo(name = "race") val race: String,
     @ColumnInfo(name = "abilities") val abilities: String,
