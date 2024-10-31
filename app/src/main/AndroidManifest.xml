@@ -7,6 +7,9 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.AppCompat.DayNight.DarkActionBar">
         <activity
+            android:name=".PlayerDetailsActivity"
+            android:exported="false" />
+        <activity
             android:name=".EditPlayerActivity"
             android:exported="false" />
         <activity

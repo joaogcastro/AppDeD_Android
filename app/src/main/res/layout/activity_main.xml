@@ -1,5 +1,4 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:padding="16dp"
@@ -16,11 +15,22 @@
         android:padding="12dp" />
 
     <Button
+        android:id="@+id/seeDetails"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Ver detalhes"
+        android:layout_below="@id/createPlayerButton"
+        android:layout_marginBottom="16dp"
+        android:background="@drawable/button_background"
+        android:textColor="#FFFFFF"
+        android:padding="12dp" />
+
+    <Button
         android:id="@+id/editPlayerButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Editar Jogador"
-        android:layout_below="@id/createPlayerButton"
+        android:layout_below="@+id/seeDetails"
         android:layout_marginBottom="16dp"
         android:background="@drawable/button_background"
         android:textColor="#FFFFFF"
@@ -47,11 +57,21 @@
         android:layout_below="@+id/deletePlayerButton"
         android:layout_marginBottom="8dp" />
 
+    <TextView
+        android:id="@+id/emptyListMessage"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Nenhum jogador encontrado."
+        android:textColor="#FFFFFF"
+        android:layout_below="@+id/playersTitleTextView"
+        android:visibility="gone" />
+
     <ListView
         android:id="@+id/playersListView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@+id/playersTitleTextView"
-        android:layout_marginTop="16dp" />
+        android:layout_below="@+id/emptyListMessage"
+        android:layout_marginTop="16dp"
+        android:visibility="gone" />
 
 </RelativeLayout>

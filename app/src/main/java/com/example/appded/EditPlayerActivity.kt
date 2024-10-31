@@ -13,8 +13,15 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import com.example.appded.database.AppDatabase
 import com.example.appded.player.Player
-import com.example.appded.player.PlayerBuilder
 import com.example.appded.player.PlayerController
+import com.example.appded.utils.abilitiesSample
+import com.example.appded.utils.assignAbilities
+import com.example.appded.utils.getStatus
+import com.example.appded.utils.pointCost
+import com.example.appded.utils.races
+import com.example.appded.utils.setHealthPoints
+import com.example.appded.utils.setRaceModifiers
+import com.example.appded.utils.unSetRaceModifiers
 import kotlinx.coroutines.launch
 import races.*
 
@@ -25,20 +32,21 @@ class EditPlayerActivity : AppCompatActivity() {
     private lateinit var saveChangesButton: Button
     private lateinit var backButton: Button
     private lateinit var playerStatusTextView: TextView
-    private var selectedRace: Race? = null
     private lateinit var database: AppDatabase
     private lateinit var playerController: PlayerController
-    private lateinit var currentPlayer: Player
-    private val playerBuilder = PlayerBuilder()
+    private var currentPlayer: Player? = null
+    private var selectedRace: Race? = null
+    private var isAbilitiesChanged = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_edit_player)
 
+        // Instancia do db
         database = AppDatabase.getDatabase(applicationContext)
         playerController = PlayerController(database.playerDao())
 
-        // Referencias as views
+        // Referencia as views
         nameInput = findViewById(R.id.nameInput)
         selectRaceButton = findViewById(R.id.selectRaceButton)
         selectAbilitiesButton = findViewById(R.id.selectAbilitiesButton)
@@ -46,8 +54,14 @@ class EditPlayerActivity : AppCompatActivity() {
         backButton = findViewById(R.id.backButton)
         playerStatusTextView = findViewById(R.id.playerStatusTextView)
 
-        // Carregar o jogador atual a partir do Intent
-        val playerId = intent.getLongExtra("PLAYER_ID", -1).toInt()
+        // Configura os listeners
+        selectRaceButton.setOnClickListener { showRaceSelectionDialog() }
+        selectAbilitiesButton.setOnClickListener { showAbilityValueInputDialog() }
+        saveChangesButton.setOnClickListener { savePlayerChanges() }
+        backButton.setOnClickListener { finish() }
+
+        // Carrega o jogador selecionado a partir do Intent
+        val playerId = intent.getIntExtra("PLAYER_ID", -1)
         if (playerId == -1) {
             Toast.makeText(this, "ID de jogador invalido", Toast.LENGTH_SHORT).show()
             finish()
@@ -55,29 +69,18 @@ class EditPlayerActivity : AppCompatActivity() {
         }
 
         loadPlayer(playerId)
-
-        // Configura os listeners
-        selectRaceButton.setOnClickListener { showRaceSelectionDialog() }
-        selectAbilitiesButton.setOnClickListener { showAbilityValueInputDialog() }
-        saveChangesButton.setOnClickListener { savePlayerChanges() }
-        backButton.setOnClickListener { finish() }
     }
 
     private fun loadPlayer(playerId: Int) {
         lifecycleScope.launch {
-            currentPlayer = playerController.getPlayerById(playerId)!!
-            if (currentPlayer != null) {
-                try {
-                    nameInput.setText(currentPlayer.name)
-                    playerBuild.unSetRaceModifiers(currentPlayer)
-                    selectedRace = currentPlayer.race
-                    playerStatusTextView.text = playerBuilder.getStatus(currentPlayer)
-                } catch(e) {
-                    Toast.makeText(this@EditPlayerActivity, "Erro ao carregar dados do player na activity", Toast.LENGTH_SHORT).show()    
-                }
+            currentPlayer = playerController.getPlayerById(playerId)
+            if(currentPlayer != null) {
+                nameInput.setText(currentPlayer!!.name)
+                selectedRace = currentPlayer!!.race
+                playerStatusTextView.text = getStatus(currentPlayer!!)
             } else {
-                Toast.makeText(this@EditPlayerActivity, "Jogador nao encontrado", Toast.LENGTH_SHORT).show()
-                finish()
+                Toast.makeText(this@EditPlayerActivity, "Personagem não encontrado no banco de dados", Toast.LENGTH_SHORT).show()
+                this@EditPlayerActivity.finish()
             }
         }
     }
@@ -85,17 +88,23 @@ class EditPlayerActivity : AppCompatActivity() {
     private fun savePlayerChanges() {
         val playerName = nameInput.text.toString()
         if (playerName.isEmpty() || selectedRace == null) {
-            Toast.makeText(this, "Por favor, insira um nome e selecione uma raça.", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, "Por favor, insira um nome e selecione uma raca.", Toast.LENGTH_SHORT).show()
             return
         }
-        currentPlayer.name = playerName
-        currentPlayer.race = selectedRace
+
+        if(!isAbilitiesChanged) { unSetRaceModifiers(currentPlayer!!) }
+
+        currentPlayer!!.name = playerName
+        currentPlayer!!.race = selectedRace
+        setRaceModifiers(currentPlayer!!)
+        setHealthPoints(currentPlayer!!)
+        playerStatusTextView.text = getStatus(currentPlayer!!)
+        isAbilitiesChanged = false
 
         lifecycleScope.launch {
             try {
-                playerController.update(currentPlayer)
+                playerController.update(currentPlayer!!)
                 Toast.makeText(this@EditPlayerActivity, "Player atualizado com sucesso!", Toast.LENGTH_SHORT).show()
-                finish()
             } catch (e: Exception) {
                 Toast.makeText(this@EditPlayerActivity, "Erro ao atualizar o player: $e", Toast.LENGTH_SHORT).show()
             }
@@ -103,7 +112,6 @@ class EditPlayerActivity : AppCompatActivity() {
     }
 
     private fun showRaceSelectionDialog() {
-        val races = playerBuilder.races
         val raceNames = races.map { it.name }.toTypedArray()
 
         AlertDialog.Builder(this)
@@ -119,9 +127,10 @@ class EditPlayerActivity : AppCompatActivity() {
         val builder = AlertDialog.Builder(this)
         builder.setTitle("Insira os Valores das Habilidades")
 
-        val abilities = playerBuilder.abilitiesSample
+        val abilities = abilitiesSample
         val abilityInput = Array(abilities.size) { EditText(this) }
         val remainingPointsTextView = TextView(this)
+        var pointsRemaining = 27
         var totalPointsSpent = 0
 
         abilities.forEachIndexed { index, ability ->
@@ -129,16 +138,15 @@ class EditPlayerActivity : AppCompatActivity() {
             abilityInput[index].inputType = android.text.InputType.TYPE_CLASS_NUMBER
             abilityInput[index].addTextChangedListener(object : TextWatcher {
                 override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+                override fun afterTextChanged(s: Editable?) {}
 
                 override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
                     totalPointsSpent = abilityInput.sumOf {
-                        it.text.toString().toIntOrNull()?.let { value -> playerBuilder.pointCost[value] ?: 0 } ?: 0
+                        it.text.toString().toIntOrNull()?.let { value -> pointCost[value] ?: 0 } ?: 0
                     }
-                    val pointsRemaining = playerBuilder.pointBuyBalance - totalPointsSpent
+                    pointsRemaining -= totalPointsSpent
                     remainingPointsTextView.text = "Pontos Restantes: $pointsRemaining"
                 }
-
-                override fun afterTextChanged(s: Editable?) {}
             })
         }
 
@@ -163,7 +171,8 @@ class EditPlayerActivity : AppCompatActivity() {
             if (totalPointsSpent > 27) {
                 Toast.makeText(this, "Erro: O total de pontos nao pode ultrapassar 27.", Toast.LENGTH_SHORT).show()
             } else {
-                playerBuilder.assignAbilities(currentPlayer, finalValues)
+                assignAbilities(currentPlayer!!, finalValues)
+                isAbilitiesChanged = true
                 Toast.makeText(this, "Habilidades definidas!", Toast.LENGTH_SHORT).show()
             }
         }

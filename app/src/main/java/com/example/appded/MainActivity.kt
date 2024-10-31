@@ -20,6 +20,7 @@ import kotlinx.coroutines.launch
 class MainActivity : AppCompatActivity() {
     private lateinit var playerController: PlayerController
     private lateinit var createPlayerButton: Button
+    private lateinit var createSeeDetailsButton: Button
     private lateinit var editPlayerButton: Button
     private lateinit var deletePlayerButton: Button
     private lateinit var playersListView: ListView
@@ -39,10 +40,18 @@ class MainActivity : AppCompatActivity() {
             startActivity(intent)
         }
 
+        createSeeDetailsButton = findViewById(R.id.seeDetails)
+        createSeeDetailsButton.visibility = View.GONE
+        createSeeDetailsButton.setOnClickListener {
+            val intent = Intent(this, PlayerDetailsActivity::class.java)
+            intent.putExtra("PLAYER_ID", selectedPlayer?.id)
+            startActivity(intent)
+        }
+
         editPlayerButton = findViewById(R.id.editPlayerButton)
         editPlayerButton.visibility = View.GONE
         editPlayerButton.setOnClickListener {
-            val intent = Intent(this, CreatePlayerActivity::class.java)
+            val intent = Intent(this, EditPlayerActivity::class.java)
             intent.putExtra("PLAYER_ID", selectedPlayer?.id)
             startActivity(intent)
         }
@@ -50,19 +59,39 @@ class MainActivity : AppCompatActivity() {
         deletePlayerButton = findViewById(R.id.deletePlayerButton)
         deletePlayerButton.visibility = View.GONE
         deletePlayerButton.setOnClickListener {
+            if (selectedPlayer == null) {
+                Toast.makeText(this@MainActivity, "Nenhum jogador selecionado", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+
             lifecycleScope.launch {
-				try {
-					playerController.delete(selectedPlayer)
-					Toast.makeText(this, "Jogador ${selectedPlayer.name}deletado com sucesso", Toast.LENGTH_SHORT).show()
-					loadPlayers()
-				} catch (e) {
-					Toast.makeText(this, "Erro ao deletar jogador ${e}", Toast.LENGTH_SHORT).show()
-				}
-			}
+                try {
+                    if(playerController.delete(selectedPlayer)) {
+                        Toast.makeText(this@MainActivity, "Jogador ${selectedPlayer!!.name} deletado com sucesso", Toast.LENGTH_SHORT).show()
+                        selectedPlayer = null
+                        editPlayerButton.visibility = View.GONE
+                        deletePlayerButton.visibility = View.GONE
+                        loadPlayers()
+                    } else {
+                        Toast.makeText(this@MainActivity, "Erro ao deletar jogador", Toast.LENGTH_SHORT).show()
+                    }
+                } catch (e: Exception) {
+                    Toast.makeText(this@MainActivity, "Erro ao deletar jogador: ${e.message}", Toast.LENGTH_SHORT).show()
+                }
+            }
         }
 		
 		// List dinamica que mostra os players na tela
         playersListView = findViewById(R.id.playersListView)
+        loadPlayers()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        createSeeDetailsButton.visibility = View.GONE
+        editPlayerButton.visibility = View.GONE
+        deletePlayerButton.visibility = View.GONE
+        selectedPlayer = null
         loadPlayers()
     }
 
@@ -76,9 +105,15 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun updateListView() {
+        val emptyListMessage = findViewById<TextView>(R.id.emptyListMessage)
+
         if (playersList.isEmpty()) {
-            Toast.makeText(this, "Nenhum jogador encontrado.", Toast.LENGTH_SHORT).show()
+            emptyListMessage.visibility = View.VISIBLE // Exibe a mensagem
+            playersListView.visibility = View.GONE // Esconde a lista
             return
+        } else {
+            emptyListMessage.visibility = View.GONE // Esconde a mensagem
+            playersListView.visibility = View.VISIBLE // Exibe a lista
         }
 
         val playersNamesList = playersList.map { "Nome: ${it.name}, Raça: ${it.race?.name}" }
@@ -90,12 +125,13 @@ class MainActivity : AppCompatActivity() {
                 return textView
             }
         }
-		
+
         playersListView.adapter = adapter
 
         playersListView.setOnItemClickListener { _, _, position, _ ->
             selectedPlayer = playersList[position]
             Toast.makeText(this, "Selecionado: ${selectedPlayer?.name}", Toast.LENGTH_SHORT).show()
+            createSeeDetailsButton.visibility = View.VISIBLE
             editPlayerButton.visibility = View.VISIBLE
             deletePlayerButton.visibility = View.VISIBLE
         }

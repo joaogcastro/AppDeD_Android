@@ -21,8 +21,12 @@ class PlayerController (private val playerDao: PlayerDao){
         playerDao.update(convertToEntity(player))
     }
 
-    suspend fun delete(player: Player) {
-        playerDao.delete(convertToEntity(player))
+    suspend fun delete(player: Player?): Boolean {
+        if(player != null) {
+            playerDao.delete(convertToEntity(player))
+            return true
+        }
+        return false
     }
 
     suspend fun getPlayerById(id: Int): Player? {
@@ -53,12 +57,12 @@ class PlayerController (private val playerDao: PlayerDao){
      */
     private fun convertToEntity(player: Player): PlayerEntity {
         return PlayerEntity(
-            id = player.id,
-            name = player.name,
-            race = convertRace(player.race),
-            abilities = convertAbilities(player.abilities),
-            healthPoints = player.healthPoints,
-            hitDie = player.hitDie
+            id = player.id ?: 0,
+            name = player.name ?: "",
+            race = convertRace(player.race) ?: "",
+            abilities = convertAbilities(player.abilities) ?: "",
+            healthPoints = player.healthPoints ?: 0,
+            hitDie = player.hitDie ?: 0
         )
     }
 
