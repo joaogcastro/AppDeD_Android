@@ -1,0 +1,74 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="16dp"
+    android:background="#000000">
+
+    <EditText
+        android:id="@+id/nameInput"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Digite o nome do jogador"
+        android:minHeight="48dp"
+        android:background="@drawable/edittext_background"
+        android:textColor="#FFFFFF"
+        android:textColorHint="#CCCCCC"
+        android:layout_marginBottom="30dp" />
+
+    <Button
+        android:id="@+id/selectRaceButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Selecionar Raça"
+        android:layout_below="@id/nameInput"
+        android:layout_marginBottom="15dp"
+        android:background="@drawable/button_background"
+        android:textColor="#FFFFFF"
+        android:padding="12dp" />
+
+    <Button
+        android:id="@+id/selectAbilitiesButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Selecionar Habilidades"
+        android:layout_below="@id/selectRaceButton"
+        android:layout_marginBottom="15dp"
+        android:background="@drawable/button_background"
+        android:textColor="#FFFFFF"
+        android:padding="12dp" />
+
+    <Button
+        android:id="@+id/createPlayerButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Criar Personagem"
+        android:layout_below="@id/selectAbilitiesButton"
+        android:layout_marginBottom="15dp"
+        android:background="@drawable/button_background"
+        android:textColor="#FFFFFF"
+        android:padding="12dp" />
+
+    <Button
+        android:id="@+id/backButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Voltar"
+        android:layout_below="@id/createPlayerButton"
+        android:layout_marginBottom="15dp"
+        android:background="@drawable/button_background"
+        android:textColor="#FFFFFF"
+        android:padding="12dp"/>
+
+    <TextView
+        android:id="@+id/playerStatusTextView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/backButton"
+        android:text="O status do personagem aparecera aqui"
+        android:textColor="#FFFFFF"
+        android:textSize="16sp"
+        android:background="@drawable/edittext_background"
+        android:padding="20dp"
+        android:layout_marginBottom="16dp" />
+
+</RelativeLayout>
