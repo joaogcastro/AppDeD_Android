@@ -20,7 +20,7 @@ import kotlinx.coroutines.launch
 class MainActivity : AppCompatActivity() {
     private lateinit var playerController: PlayerController
     private lateinit var createPlayerButton: Button
-    private lateinit var createSeeDetailsButton: Button
+    private lateinit var seeDetailsButton: Button
     private lateinit var editPlayerButton: Button
     private lateinit var deletePlayerButton: Button
     private lateinit var playersListView: ListView
@@ -40,9 +40,9 @@ class MainActivity : AppCompatActivity() {
             startActivity(intent)
         }
 
-        createSeeDetailsButton = findViewById(R.id.seeDetails)
-        createSeeDetailsButton.visibility = View.GONE
-        createSeeDetailsButton.setOnClickListener {
+        seeDetailsButton = findViewById(R.id.seeDetails)
+        seeDetailsButton.visibility = View.GONE
+        seeDetailsButton.setOnClickListener {
             val intent = Intent(this, PlayerDetailsActivity::class.java)
             intent.putExtra("PLAYER_ID", selectedPlayer?.id)
             startActivity(intent)
@@ -71,6 +71,7 @@ class MainActivity : AppCompatActivity() {
                         selectedPlayer = null
                         editPlayerButton.visibility = View.GONE
                         deletePlayerButton.visibility = View.GONE
+                        seeDetailsButton.visibility = View.GONE
                         loadPlayers()
                     } else {
                         Toast.makeText(this@MainActivity, "Erro ao deletar jogador", Toast.LENGTH_SHORT).show()
@@ -88,7 +89,7 @@ class MainActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
-        createSeeDetailsButton.visibility = View.GONE
+        seeDetailsButton.visibility = View.GONE
         editPlayerButton.visibility = View.GONE
         deletePlayerButton.visibility = View.GONE
         selectedPlayer = null
@@ -131,7 +132,7 @@ class MainActivity : AppCompatActivity() {
         playersListView.setOnItemClickListener { _, _, position, _ ->
             selectedPlayer = playersList[position]
             Toast.makeText(this, "Selecionado: ${selectedPlayer?.name}", Toast.LENGTH_SHORT).show()
-            createSeeDetailsButton.visibility = View.VISIBLE
+            seeDetailsButton.visibility = View.VISIBLE
             editPlayerButton.visibility = View.VISIBLE
             deletePlayerButton.visibility = View.VISIBLE
         }

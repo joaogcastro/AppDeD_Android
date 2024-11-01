@@ -98,9 +98,9 @@ class PlayerController (private val playerDao: PlayerDao){
             "Dwarf" -> gson.fromJson(race, Dwarf::class.java)
             "Elf" -> gson.fromJson(race, Elf::class.java)
             "Gnome" -> gson.fromJson(race, Gnome::class.java)
-            "HalfElf" -> gson.fromJson(race, HalfElf::class.java)
+            "Half-Elf" -> gson.fromJson(race, HalfElf::class.java)
             "Halfling" -> gson.fromJson(race, Halfling::class.java)
-            "HalfOrc" -> gson.fromJson(race, HalfOrc::class.java)
+            "Half-Orc" -> gson.fromJson(race, HalfOrc::class.java)
             "Human" -> gson.fromJson(race, Human::class.java)
             "Tiefling" -> gson.fromJson(race, Tiefling::class.java)
             else -> null
